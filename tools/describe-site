@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+import csv
+import feedparser
+import sys
+
+def extract_info(content):
+    d = feedparser.parse(content)
+    feed = d['feed']
+    return list([feed['link'], feed['title'], feed['description']])
+
+try:
+    site_info = extract_info(sys.stdin.read())
+    with sys.stdout as csvout:
+        writer = csv.writer(csvout)
+        writer.writerow(site_info)
+except:
+    pass
