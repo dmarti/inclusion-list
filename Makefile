@@ -4,7 +4,7 @@ ADSTXT=$(DOMAINS:%=sources/adstxt/%/ads.txt)
 FEEDS=$(DOMAINS:%=sources/feeds/%/feed.xml)
 DESCRIPTIONS=$(DOMAINS:%=data/descriptions/%)
 
-all : lists/ALL.txt $(ADSTXT) inclusion.csv
+all : lists/ALL.txt $(ADSTXT) $(INDEXES) $(FEEDS) inclusion.csv
 
 sources/adstxt/%/ads.txt : 
 	mkdir -p `dirname $@`
@@ -37,10 +37,16 @@ inclusion.csv : $(DESCRIPTIONS)
 	echo "domain,title,description" > $@
 	find data/descriptions -type f | xargs cat >> $@
 
+fresh :
+	find sources/homes/ -type f -size 0 | xargs ls -t | tail | xargs rm
+	find sources/feeds/ -type f -size 0 | xargs ls -t | tail | xargs rm
+	find sources/adstxt/ -type f -size 0 | xargs ls -t | tail | xargs rm
+	find data/descriptions/ -type f -size 0 | xargs ls -t | tail | xargs rm
+
 clean :
-	rm -rf data lists
+	rm -rf data lists inclusion.csv
 
 pristine : clean
 	rm -rf sources
 
-.PHONY : clean pristine
+.PHONY : clean fresh pristine
