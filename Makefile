@@ -42,6 +42,8 @@ fresh :
 	find sources/feeds/ -type f -size 0 | xargs ls -t | tail | xargs rm
 	find sources/adstxt/ -type f -size 0 | xargs ls -t | tail | xargs rm
 	find data/descriptions/ -type f -size 0 | xargs ls -t | tail | xargs rm
+	find sources/feeds -type f -mtime +7 | head -n 10 | xargs -n 1 rm
+	find sources -type d | xargs rmdir --ignore-fail-on-non-empty
 
 clean :
 	rm -rf data lists inclusion.csv
