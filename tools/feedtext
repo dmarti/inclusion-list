@@ -1,0 +1,32 @@
+#! /usr/bin/env python3
+
+from bs4 import BeautifulSoup
+import feedparser
+import re
+import string
+import sys
+
+pattern =  re.compile('[\W_]+')
+
+def strip_markup(stuff):
+    tmp = ' '.join(BeautifulSoup(stuff, "lxml").findAll(text=True))
+    tmp = pattern.sub(' ', tmp)
+    return ' '.join(tmp.split())
+
+def feedtext(filename):
+    doc = feedparser.parse(filename)
+    result = []
+
+    for ent in doc.entries:
+        detail = ent.get('summary_detail', '')
+        if detail:
+            detail = detail.get('value', '')
+        for con in ent.get('content', ()):
+            if len(con.get('value', '')) > len(detail):
+                detail = con['value']
+        result.append(strip_markup(detail))
+    return ' '.join(result)
+    
+
+if __name__ == '__main__':
+    print(feedtext(sys.argv[1]))

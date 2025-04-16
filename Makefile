@@ -2,9 +2,10 @@ DOMAINS=$(shell cat lists/ALL.txt)
 INDEXES=$(DOMAINS:%=sources/homes/%/index.html)
 ADSTXT=$(DOMAINS:%=sources/adstxt/%/ads.txt)
 FEEDS=$(DOMAINS:%=sources/feeds/%/feed.xml)
+FEEDTEXTS=$(DOMAINS:%=data/feedtext/%/feed.txt)
 DESCRIPTIONS=$(DOMAINS:%=data/descriptions/%)
 
-all : lists/ALL.txt $(ADSTXT) $(INDEXES) $(FEEDS) inclusion.csv
+all : lists/ALL.txt $(ADSTXT) $(INDEXES) $(FEEDS) $(FEEDTEXTS) inclusion.csv
 
 sources/adstxt/%/ads.txt : 
 	mkdir -p `dirname $@`
@@ -17,6 +18,10 @@ sources/homes/%/index.html :
 sources/feeds/%/feed.xml : sources/homes/%/index.html
 	mkdir -p `dirname $@`
 	tools/get_feed < $< | xargs curl --connect-timeout 15 -L > $@ || touch $@
+
+data/feedtext/%/feed.txt : sources/feeds/%/feed.xml
+	mkdir -p `dirname $@`
+	tools/feedtext $< > $@ || touch $@
 
 data/descriptions/% : sources/feeds/%/feed.xml tools/describe-site
 	mkdir -p `dirname $@`
